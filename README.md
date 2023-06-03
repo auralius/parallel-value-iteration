@@ -6,7 +6,7 @@ https://www.mathworks.com/matlabcentral/fileexchange/39034-finding-an-optimal-pa
 
 However, instead of having a terrain map where a cost value describes terrain height in a given location, we now have a binary map where a cost value describes obstacle existence in that given location. 
 
-To compile the path_planner.pyxd file: 
+To compile the path_planner.pyx file: 
 
 ```
 python setup.py build_ext --inplace
