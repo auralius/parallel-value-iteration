@@ -2,6 +2,20 @@ from setuptools import Extension, setup
 from Cython.Build import cythonize
 import numpy
 
+import os
+import glob
+
+pyd = glob.glob('*.pyd', recursive=True)
+c = glob.glob('*.c', recursive=True)
+
+if len(pyd) > 0:
+    for f in pyd:
+        os.remove(f)
+
+if len(c) > 0:
+    for f in c:
+        os.remove(f)
+
 ext_modules = [
     Extension(
         "path_planner",
