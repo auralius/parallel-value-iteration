@@ -20,3 +20,5 @@ The binary occupacy maps are the JPG files (see map1.jpg and map2.jpg as example
 ![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map1.png?raw=true)
 
 ![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map2.png?raw=true)
+
+For Windows, simply replace `-fopenmp` witn `/openmp`.
