@@ -60,15 +60,15 @@ def extract_traj(src, trgt, descendantX_arr, descendantY_arr, policy, max_horizo
 cost_mat = get_obstacle_map(MAP_FILE)
 
 # Units are in pixels!
-src1 = np.array([100, 482])
-src2 = np.array([10, 270])
-src3 = np.array([130, 10])
+src1 = np.array([100, 482], dtype=np.int32)
+src2 = np.array([10, 270], dtype=np.int32)
+src3 = np.array([130, 10], dtype=np.int32)
 
-trgt = np.array([469, 10])
+trgt = np.array([469, 10], dtype=np.int32)
 
 start = time.time()
 
-descendantX_arr, descendantY_arr, policy = path_planner.terrain_value_iteration(cost_mat, trgt, np.array([STEP_X, STEP_Y]), MAX_HORIZONS, SHOW_INFO)
+descendantX_arr, descendantY_arr, policy = path_planner.terrain_value_iteration(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
 trajs1, u1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, policy, MAX_HORIZONS)
 trajs2, u2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, policy, MAX_HORIZONS)
 trajs3, u3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, policy, MAX_HORIZONS)
