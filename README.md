@@ -1,4 +1,4 @@
-# binary_terrain_value_iteration
+# Parallel value iteration
 
 The problem here is similar to:
 
