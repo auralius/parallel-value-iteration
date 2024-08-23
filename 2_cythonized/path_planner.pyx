@@ -75,7 +75,7 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
         memcpy(Jprev_ptr, J_ptr, mem_size)        
         
         for x in prange(nX, nogil=True): 
-            for y in range(nY):
+            for y in prange(nY):
                 Jplus1 = 100000
                 
                 for uIdx in range(9):
@@ -97,7 +97,7 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
                     Jplus1_ =  Jprev_arr[xNext][yNext] + terrain_mtx[xNext, yNext]
                                         
                     # Get the smallest one
-                    if Jplus1_ <= Jplus1:
+                    if Jplus1_ < Jplus1:
                         Jplus1 = Jplus1_
                         xMin = xNext
                         yMin = yNext
