@@ -8,6 +8,12 @@ However, instead of having a terrain map where the costs correspond to the terra
 
 **The main objective here is to parallelize the value iteration algorithm by using different frameworks/methods.**
 
+Implemented frameworks so far:
+
+- Vanilla: no parallelization
+- Vectorized: state-and-input flattening to eliminate nested-for, this process only relies on NumPy 
+- Cython: nested parallel-for with OpenMP and Cython
+- Numba: nested parallel-for with Numba
 ---
 
 ### For the Cython version:
