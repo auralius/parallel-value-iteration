@@ -1,7 +1,7 @@
 import numpy as np
 from multiprocessing import Pool, cpu_count
 from contextlib import closing
-from numba import jit, int32, types
+
 
 class MPVI:
     def __init__(self, terrain_mtx, target, steps, max_horizon, append=1):
