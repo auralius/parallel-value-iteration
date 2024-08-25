@@ -25,7 +25,7 @@ To compile the path_planner.pyx file:
 python setup.py build_ext --inplace
 ```
 
-For Windows, simply replace `-fopenmp` witn `/openmp`.
+For Windows, open `setup.py` and simply replace `-fopenmp` with `/openmp`.
 
 ### For the MPI version:
 
