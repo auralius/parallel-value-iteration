@@ -4,6 +4,7 @@ import time
 
 from helper import *
 from path_planner import *
+from path_planner import MPVI
 
 # -----------------------------------------------------------------------------
 MAP_FILE = "./maps/map1.jpg"
@@ -25,7 +26,10 @@ trgt = np.array([469, 10], dtype=np.int32)
 
 start = time.time()
 
-descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
+q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
+q.run()
+descendantX_arr, descendantY_arr = q.get_descendent_arrays()
+
 trajs1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)

@@ -22,35 +22,44 @@ class MPVI:
         self._J = np.zeros((self._nX, self._nY), dtype=np.int32)
         self._Jprev = np.zeros((self._nX, self._nY), dtype=np.int32)
 
-        self._XMIN = 0
-        self._XMAX = self._nX - 1
-        self._YMIN = 0
-        self._YMAX = self._nY - 1
+        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32) 
+        self._u = u * self._steps 
+        self._nU = len(u)
 
-        self._u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32)  
-        self._u = self._u * self._steps
 
     def subprocess(self, x):
+        XMAX = self._nX - 1
+        YMAX = self._nY - 1
+    
         descendentX = np.zeros(self._nY, dtype=np.int32)
         descendentY = np.zeros(self._nY, dtype=np.int32)
         J = np.zeros(self._nY, dtype=np.int32)
 
-        for y in range(self._nY):
-            xNext = np.array([x,y]) + self._u                
-            xNext = np.clip(xNext, [self._XMIN, self._YMIN], [self._XMAX, self._YMAX])
-            Jplus =  self._Jprev[xNext[:,0], xNext[:,1]] + self._terrain_mtx[xNext[:,0], xNext[:,1]] 
-            idx = np.argmin(Jplus)                        
-            xMin = xNext[idx, 0]
-            yMin = xNext[idx, 1]
-                
-            J[y] = Jplus[idx]
+        Jprev = self._Jprev
+        terrain_mtx = self._terrain_mtx
 
-            # Store the currrnt optimal node
-            descendentX[y] = xMin
-            descendentY[y] = yMin
+        m = np.repeat(x, self._nY).reshape(-1,1)
+        n = np.arange(0, self._nY).reshape(-1,1)
+        X = np.tile(m, self._nU)
+        Y = np.tile(n, self._nU)
+
+        xNext = X + self._u[:, 0]
+        yNext = Y + self._u[:, 1]
+
+        xNext = np.clip(xNext, 0, XMAX)
+        yNext = np.clip(yNext, 0, YMAX)
+        
+        Jplus_ =  Jprev[xNext,yNext] + terrain_mtx[xNext, yNext]
+        idx = np.argmin(Jplus_, axis=1)
+
+        xMin = xNext[n, idx[n]]
+        yMin = yNext[n, idx[n]]
+        J[n] = Jplus_[n, idx[n]]
+
+        descendentX[n] = xMin
+        descendentY[n] = yMin
         
         return np.hstack((descendentX, descendentY, J))
-
 
 
     def run(self):
