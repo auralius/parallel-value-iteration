@@ -42,20 +42,15 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
     cdef np.ndarray [np.float32_t, ndim=2] J = np.zeros((nX, nY), dtype=np.float32)
     cdef np.ndarray [np.float32_t, ndim=2] Jprev = np.zeros((nX, nY), dtype=np.float32)
     
-    cdef np.float32_t[:, :] J_arr = J
-    cdef np.float32_t[:, :] Jprev_arr = Jprev
-    cdef np.float32_t *J_ptr = &J_arr[0, 0]
-    cdef np.float32_t *Jprev_ptr = &Jprev_arr[0, 0]
+    # pointers for memcpy
+    cdef np.float32_t *J_ptr = &J[0, 0]
+    cdef np.float32_t *Jprev_ptr = &Jprev[0, 0]
 
     cdef np.ndarray [np.int32_t, ndim=2] u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32)  
     u = u * steps
-    cdef np.int32_t[:, :] u_arr = u
     
-    cdef np.ndarray [np.int32_t, ndim=2] descendantX = np.zeros((nX, nY), dtype=np.int32)
-    cdef np.ndarray [np.int32_t, ndim=2] descendantY = np.zeros((nX, nY), dtype=np.int32)
-
-    cdef np.int32_t[:, :] descendentX_arr = descendantX
-    cdef np.int32_t[:, :] descendentY_arr = descendantY
+    cdef np.ndarray [np.int32_t, ndim=2] descendentX = np.zeros((nX, nY), dtype=np.int32)
+    cdef np.ndarray [np.int32_t, ndim=2] descendentY = np.zeros((nX, nY), dtype=np.int32)
 
     cdef double past_error = 1e20
     cdef double error = 0.0
@@ -80,8 +75,8 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
                 
                 for uIdx in range(9):
                     # Given current input u, find next state information
-                    xNext = x + u_arr[uIdx][0]
-                    yNext = y + u_arr[uIdx][1]
+                    xNext = x + u[uIdx, 0]
+                    yNext = y + u[uIdx, 1]
                     
                     # Apply the bounds
                     if xNext > XMAX:
@@ -94,7 +89,7 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
                     elif yNext < YMIN:
                         yNext = YMIN
 
-                    Jplus1_ =  Jprev_arr[xNext][yNext] + terrain_mtx[xNext, yNext]
+                    Jplus1_ =  Jprev[xNext, yNext] + terrain_mtx[xNext, yNext]
                                         
                     # Get the smallest one
                     if Jplus1_ < Jplus1:
@@ -102,11 +97,11 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
                         xMin = xNext
                         yMin = yNext
                                                         
-                J_arr[x][y] = Jplus1
+                J[x,y] = Jplus1
 
                 # Store the currrnt optimal node
-                descendentX_arr[x][y] = xMin
-                descendentY_arr[x][y] = yMin
+                descendentX[x, y] = xMin
+                descendentY[x, y] = yMin
         
         error = np.linalg.norm(J - Jprev)
 
@@ -119,7 +114,7 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
  
         past_error = error
 
-    return descendentX_arr, descendentY_arr
+    return descendentX, descendentY
 
 
 '''
