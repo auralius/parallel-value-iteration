@@ -14,7 +14,8 @@ Implemented frameworks so far:
 - Vectorized: state-and-input flattening to eliminate nested-for, this process only relies on NumPy 
 - Cython: nested parallel-for with OpenMP and Cython
 - Numba: nested parallel-for with Numba
----
+- Python multiprocessing: multiprocessing pool is applied to the outer-most loop, the remaining nested-loop is vectorized
+- MPI: MPI is applied to the outer-most loop, the remaining nested-loop is vectorized
 
 ### For the Cython version:
 
@@ -26,7 +27,16 @@ python setup.py build_ext --inplace
 
 For Windows, simply replace `-fopenmp` witn `/openmp`.
 
----
+### For the MPI version:
+
+Run the demo file by using the `mpiexec` command, for example:
+
+```
+mpiexec -n 2 python ./5_mpi4py/demo1.py
+```
+
+where ``-n 2`` represents the number of CPU cores.
+
 
 ### Map files
 
