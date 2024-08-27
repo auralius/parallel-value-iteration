@@ -21,7 +21,7 @@ trgt = np.array([178, 32], dtype=np.int32)
 
 start = time.time()
 q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-q.run()
+q.run(ncpu=4)
 descendantX_arr, descendantY_arr = q.get_descendent_arrays()
 trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 

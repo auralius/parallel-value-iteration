@@ -1,5 +1,5 @@
 import numpy as np
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool
 from contextlib import closing
 
 
@@ -22,14 +22,13 @@ class MPVI:
         self._J = np.zeros((self._nX, self._nY), dtype=np.int32)
         self._Jprev = np.zeros((self._nX, self._nY), dtype=np.int32)
 
-        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32) 
-        self._u = u * self._steps 
-        self._nU = len(u)
-
 
     def subprocess(self, x):
         XMAX = self._nX - 1
         YMAX = self._nY - 1
+
+        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32) 
+        nU = 9
     
         descendentX = np.zeros(self._nY, dtype=np.int32)
         descendentY = np.zeros(self._nY, dtype=np.int32)
@@ -38,38 +37,48 @@ class MPVI:
         Jprev = self._Jprev
         terrain_mtx = self._terrain_mtx
 
-        m = np.repeat(x, self._nY).reshape(-1,1)
-        n = np.arange(0, self._nY).reshape(-1,1)
-        X = np.tile(m, self._nU)
-        Y = np.tile(n, self._nU)
+        for y in range(self._nY):
+            Jplus1 = 1000000 
+            for uIdx in range(nU):
+                xNext = x + u[uIdx, 0]
+                yNext = y + u[uIdx, 1]
 
-        xNext = X + self._u[:, 0]
-        yNext = Y + self._u[:, 1]
+                # Apply the bounds
+                if xNext > XMAX:
+                    xNext = XMAX
+                elif xNext < 0:
+                    xNext = 0
 
-        xNext = np.clip(xNext, 0, XMAX)
-        yNext = np.clip(yNext, 0, YMAX)
-        
-        Jplus_ =  Jprev[xNext,yNext] + terrain_mtx[xNext, yNext]
-        idx = np.argmin(Jplus_, axis=1)
+                if yNext > YMAX:
+                    yNext = YMAX
+                elif yNext < 0:
+                    yNext = 0
 
-        xMin = xNext[n, idx[n]]
-        yMin = yNext[n, idx[n]]
-        J[n] = Jplus_[n, idx[n]]
+                Jplus1_ =  Jprev[xNext, yNext] + terrain_mtx[xNext, yNext]
+                                    
+                # Get the smallest one
+                if Jplus1_ < Jplus1:
+                    Jplus1 = Jplus1_
+                    xMin = xNext
+                    yMin = yNext
+                
+            J[y] = Jplus1
 
-        descendentX[n] = xMin
-        descendentY[n] = yMin
+            # Store the currrnt optimal node
+            descendentX[y] = xMin
+            descendentY[y] = yMin
         
         return np.hstack((descendentX, descendentY, J))
 
 
-    def run(self):
+    def run(self, ncpu):
         print('value iteration is running...\n')
         
         past_error = 1e20
         error = 0.0
         EPSILON = 1E-6
 
-        with closing(Pool(cpu_count())) as pool:
+        with closing(Pool(ncpu)) as pool:
             for k in range(self._max_horizon):
                 self._Jprev = self._J.copy()
 
