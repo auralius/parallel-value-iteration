@@ -1,5 +1,5 @@
 import numpy as np
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 from contextlib import closing
 
 
@@ -71,13 +71,16 @@ class MPVI:
         return np.hstack((descendentX, descendentY, J))
 
 
-    def run(self, ncpu):
+    def run(self, ncpu=None):
         print('value iteration is running...\n')
         
         past_error = 1e20
         error = 0.0
         EPSILON = 1E-6
 
+        if ncpu == None:
+            ncpu = cpu_count()
+            
         with closing(Pool(ncpu)) as pool:
             for k in range(self._max_horizon):
                 self._Jprev = self._J.copy()
