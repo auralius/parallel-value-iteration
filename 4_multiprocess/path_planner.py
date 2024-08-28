@@ -5,7 +5,7 @@ from contextlib import closing
 
 class MPVI:
     def __init__(self, terrain_mtx, target, steps, max_horizon, append=1):
-        self._terrain_mtx = terrain_mtx
+        self._terrain_mtx = np.array(terrain_mtx, order='C', copy=True)
         self._terrain_mtx[target[0], target[1]] = 0.0 # set cost at the target to 0
 
         self._target = target
@@ -15,31 +15,26 @@ class MPVI:
 
         self._nX = terrain_mtx.shape[0]
         self._nY = terrain_mtx.shape[1]    
-        
-        self._descendentX = np.zeros((self._nX, self._nY), dtype=np.int32)
-        self._descendentY = np.zeros((self._nX, self._nY), dtype=np.int32)
 
-        self._J = np.zeros((self._nX, self._nY), dtype=np.int32)
-        self._Jprev = np.zeros((self._nX, self._nY), dtype=np.int32)
-
+        self._J = np.zeros((self._nX, self._nY), dtype=np.int32, order='C')
+        self._u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32, order='C')
+    
 
     def subprocess(self, x):
         XMAX = self._nX - 1
         YMAX = self._nY - 1
+        u = np.array(self._u, order='C', copy=True)
+        
+        descendentX = np.zeros(self._nY, dtype=np.int32, order='C')
+        descendentY = np.zeros(self._nY, dtype=np.int32, order='C')
+        J = np.zeros(self._nY, dtype=np.int32, order='C')
 
-        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32) 
-        nU = 9
-    
-        descendentX = np.zeros(self._nY, dtype=np.int32)
-        descendentY = np.zeros(self._nY, dtype=np.int32)
-        J = np.zeros(self._nY, dtype=np.int32)
-
-        Jprev = self._Jprev
-        terrain_mtx = self._terrain_mtx
+        Jprev = np.array(self._J, order='C', copy=True)
+        terrain_mtx = np.array(self._terrain_mtx, order='C', copy=True)
 
         for y in range(self._nY):
             Jplus1 = 1000000 
-            for uIdx in range(nU):
+            for uIdx in range(9):
                 xNext = x + u[uIdx, 0]
                 yNext = y + u[uIdx, 1]
 
@@ -80,16 +75,17 @@ class MPVI:
 
         if ncpu == None:
             ncpu = cpu_count()
-            
+
+        cunksize = int(self._nX / ncpu) 
+        
         with closing(Pool(ncpu)) as pool:
             for k in range(self._max_horizon):
-                self._Jprev = self._J.copy()
+                results = pool.map(self.subprocess, range(self._nX), chunksize=cunksize)
+                results = np.array(results, order='K', copy=True)
 
-                results = pool.map(self.subprocess, range(self._nX))
-                results = np.array(results)
-                self._descendentX, self._descendentY , self._J  = np.hsplit(results, 3)
+                descendentX, descendentY , J  = np.hsplit(results, 3)
 
-                error = np.linalg.norm(self._J - self._Jprev)
+                error = np.linalg.norm(J - self._J)
                 print('episode: ', k, ', error: ', error)
                 
                 if (past_error - error) < EPSILON:
@@ -97,10 +93,9 @@ class MPVI:
                     break
         
                 past_error = error
+                self._J = np.array(J, order='C', copy=True)
 
-        return self._descendentX, self._descendentY
+        return descendentX, descendentY
         
 
-    def get_descendent_arrays(self):
-        return self._descendentX, self._descendentY
-    
+

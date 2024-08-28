@@ -19,14 +19,15 @@ cost_mat = get_obstacle_map(MAP_FILE)
 src = np.array([52, 175], dtype=np.int32)
 trgt = np.array([178, 32], dtype=np.int32)
 
-start = time.time()
 q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-q.run(ncpu=4)
-descendantX_arr, descendantY_arr = q.get_descendent_arrays()
-trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
+start = time.time()
+descendantX_arr, descendantY_arr = q.run()
 end = time.time()
+
 print("Completion time: ", end - start, " second(s)")
+
+trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
 fig, ax = plt.subplots()
 ax.imshow(np.transpose(cost_mat), cmap='gray_r', vmin=0, vmax=255)

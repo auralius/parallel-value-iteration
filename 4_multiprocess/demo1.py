@@ -24,18 +24,19 @@ src3 = np.array([130, 10], dtype=np.int32)
 
 trgt = np.array([469, 10], dtype=np.int32)
 
-start = time.time()
 
 q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-q.run(ncpu=4)
-descendantX_arr, descendantY_arr = q.get_descendent_arrays()
+
+start = time.time()
+descendantX_arr, descendantY_arr = q.run(ncpu=36)
+end = time.time()
+
+print("Completion time: ", end - start, " second(s)")
 
 trajs1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
-end = time.time()
-print("Completion time: ", end - start, " second(s)")
 
 fig, ax = plt.subplots()
 ax.imshow(np.transpose(cost_mat), cmap='gray_r', vmin=0, vmax=255)
