@@ -1,65 +1,65 @@
 import numpy as np
-from multiprocessing import Pool, cpu_count
-from contextlib import closing
-from mpi4py import MPI
+from numba import jit, i4
+
 
 class MPIVI:
-    def __init__(self, terrain_mtx, target, steps, max_horizon, append=1):
-        self._terrain_mtx = terrain_mtx
+    def __init__(self, terrain_mtx, target, max_horizon, append=1):
+        self._terrain_mtx = np.array(terrain_mtx, order='C', copy=True)
         self._terrain_mtx[target[0], target[1]] = 0.0 # set cost at the target to 0
 
-        self._target = target
-        self._steps = steps
         self._max_horizon = max_horizon
-        self._append = append
+        self._append = append    
 
-        self._nX = terrain_mtx.shape[0]
-        self._nY = terrain_mtx.shape[1]    
+        self._J = np.zeros(self._terrain_mtx.shape, dtype=np.int32, order='C')
+
+
+    @staticmethod
+    @jit(i4[:](i4, i4[:,:], i4[:,:]))
+    def subprocess(x, Jprev, terrain_mtx):
+        nX = terrain_mtx.shape[0]
+        nY = terrain_mtx.shape[1]
+        XMAX = nX - 1
+        YMAX = nY - 1
         
-        self._descendentX = np.zeros((self._nX, self._nY), dtype=np.int32)
-        self._descendentY = np.zeros((self._nX, self._nY), dtype=np.int32)
+        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], 
+                     dtype=np.int32)
 
-        self._J = np.zeros((self._nX, self._nY), dtype=np.int32)
-        self._Jprev = np.zeros((self._nX, self._nY), dtype=np.int32)
+        descendentX = np.zeros(nY, dtype=np.int32)
+        descendentY = np.zeros(nY, dtype=np.int32)
+        J = np.zeros(nY, dtype=np.int32)
 
-        u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32) 
-        self._u = u * self._steps 
-        self._nU = len(u)
+        for y in range(nY):
+            Jplus1 = 1000000 
+            for uIdx in range(9):
+                xNext = x + u[uIdx, 0]
+                yNext = y + u[uIdx, 1]
 
+                # Apply the bounds
+                if xNext > XMAX:
+                    xNext = XMAX
+                elif xNext < 0:
+                    xNext = 0
 
-    def subprocess(self, x):
-        XMAX = self._nX - 1
-        YMAX = self._nY - 1
-    
-        descendentX = np.zeros(self._nY, dtype=np.int32)
-        descendentY = np.zeros(self._nY, dtype=np.int32)
-        J = np.zeros(self._nY, dtype=np.int32)
+                if yNext > YMAX:
+                    yNext = YMAX
+                elif yNext < 0:
+                    yNext = 0
 
-        Jprev = self._Jprev
-        terrain_mtx = self._terrain_mtx
+                Jplus1_ =  Jprev[xNext, yNext] + terrain_mtx[xNext, yNext]
+                                    
+                # Get the smallest one
+                if Jplus1_ < Jplus1:
+                    Jplus1 = Jplus1_
+                    xMin = xNext
+                    yMin = yNext
+                
+            J[y] = Jplus1
 
-        m = np.repeat(x, self._nY).reshape(-1,1)
-        n = np.arange(0, self._nY).reshape(-1,1)
-        X = np.tile(m, self._nU)
-        Y = np.tile(n, self._nU)
+            # Store the current optimal node
+            descendentX[y] = xMin
+            descendentY[y] = yMin
 
-        xNext = X + self._u[:, 0]
-        yNext = Y + self._u[:, 1]
-
-        xNext = np.clip(xNext, 0, XMAX)
-        yNext = np.clip(yNext, 0, YMAX)
-        
-        Jplus_ =  Jprev[xNext,yNext] + terrain_mtx[xNext, yNext]
-        idx = np.argmin(Jplus_, axis=1)
-
-        xMin = xNext[n, idx[n]]
-        yMin = yNext[n, idx[n]]
-        J[n] = Jplus_[n, idx[n]]
-
-        descendentX[n] = xMin
-        descendentY[n] = yMin
-        
-        return np.hstack((x, descendentX, descendentY, J))
+        return np.hstack((np.array([x]),descendentX, descendentY, J))
 
 
     def run(self, comm, rank, size):
@@ -70,23 +70,22 @@ class MPIVI:
         EPSILON = 1E-6
 
         # create partition based on the number of available cpu counts
-        x = np.arange(0, self._nX)
-        x_ = np.array_split(x, size)
+        nX = self._terrain_mtx.shape[0]
+        X = np.arange(0, nX)
+        XS = np.array_split(X, size)
 
         for k in range(self._max_horizon):
-            self._Jprev = self._J.copy()
-
             results = []
-            for x in x_[rank]:
-                results.append(self.subprocess(x))
+            for x in XS[rank]:
+                results.append(self.subprocess(x,  self._J, self._terrain_mtx))
 
             Results = comm.allgather(np.array(results))
 
             Results = np.concatenate(Results)
             Results = Results[Results[:,0].argsort()]
-            self._descendentX, self._descendentY , self._J  = np.hsplit(Results[:,1:], 3)
+            descendentX, descendentY , J  = np.hsplit(Results[:,1:], 3)
 
-            error = np.linalg.norm(self._J - self._Jprev)
+            error = np.linalg.norm(J - self._J)
             if (self._append == 1 and rank == 0):
                 print('rank: ', rank, 'episode: ', k, ', error: ', error)
             
@@ -95,10 +94,7 @@ class MPIVI:
                 break
     
             past_error = error
+            self._J = np.array(J, order='C', copy=True)
 
-        return self._descendentX, self._descendentY
+        return descendentX, descendentY
         
-
-    def get_descendent_arrays(self):
-        return self._descendentX, self._descendentY
-    

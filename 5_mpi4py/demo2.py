@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     MAP_FILE = "./maps/map2.jpg"
     MAX_HORIZONS = 2000
-    SHOW_INFO = 0
+    SHOW_INFO = 1
     STEP_X = 1
     STEP_Y = 1
 
@@ -25,23 +25,21 @@ if __name__ == '__main__':
 
     trgt = np.array([398, 317], dtype=np.int32)
 
-    start = time.time()
-
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    q = MPIVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-    q.run(comm, rank, size)
+    q = MPIVI(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
+
+    start = time.time()
+    descendantX_arr, descendantY_arr  = q.run(comm, rank, size)
+    end = time.time()
 
     if rank == 0:
-        descendantX_arr, descendantY_arr = q.get_descendent_arrays()
-
         trajs1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
         trajs2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
         trajs3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
-        end = time.time()
         print("Completion time: ", end - start, " second(s)")
 
         fig, ax = plt.subplots()

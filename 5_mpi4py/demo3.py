@@ -10,9 +10,7 @@ from mpi4py import MPI
 if __name__ == '__main__':
     MAP_FILE = "./maps/map3.jpg"
     MAX_HORIZONS = 2000
-    SHOW_INFO = 0
-    STEP_X = 1
-    STEP_Y = 1
+    SHOW_INFO = 1
 
     cost_mat = get_obstacle_map(MAP_FILE)
 
@@ -20,21 +18,19 @@ if __name__ == '__main__':
     src = np.array([52, 175], dtype=np.int32)
     trgt = np.array([178, 32], dtype=np.int32)
 
-    start = time.time()
-
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    q = MPIVI(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
 
-    q = MPIVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-    q.run(comm, rank, size)
+    start = time.time()
+    descendantX_arr, descendantY_arr = q.run(comm, rank, size)
+    end = time.time()
 
     if rank == 0:
-        descendantX_arr, descendantY_arr = q.get_descendent_arrays()
         trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
-        end = time.time()
         print("Completion time: ", end - start, " second(s)")
 
         fig, ax = plt.subplots()
