@@ -10,8 +10,6 @@ from path_planner import MPVI
 MAP_FILE = "./maps/map2.jpg"
 MAX_HORIZONS = 2000
 SHOW_INFO = 1
-STEP_X = 1
-STEP_Y = 1
 
 # -----------------------------------------------------------------------------
 cost_mat = get_obstacle_map(MAP_FILE)
@@ -23,7 +21,7 @@ src3 = np.array([30, 325], dtype=np.int32)
 
 trgt = np.array([398, 317], dtype=np.int32)
 
-q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
+q = MPVI(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
 
 start = time.time()
 descendantX_arr, descendantY_arr  = q.run()

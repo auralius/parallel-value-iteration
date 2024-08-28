@@ -10,8 +10,6 @@ from path_planner import MPVI
 MAP_FILE = "./maps/map1.jpg"
 MAX_HORIZONS = 2000
 SHOW_INFO = True
-STEP_X = 1
-STEP_Y = 1
 
 
 # -----------------------------------------------------------------------------
@@ -25,10 +23,10 @@ src3 = np.array([130, 10], dtype=np.int32)
 trgt = np.array([469, 10], dtype=np.int32)
 
 
-q = MPVI(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
+q = MPVI(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
 
 start = time.time()
-descendantX_arr, descendantY_arr = q.run(ncpu=36)
+descendantX_arr, descendantY_arr = q.run()
 end = time.time()
 
 print("Completion time: ", end - start, " second(s)")
@@ -36,7 +34,6 @@ print("Completion time: ", end - start, " second(s)")
 trajs1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
-
 
 fig, ax = plt.subplots()
 ax.imshow(np.transpose(cost_mat), cmap='gray_r', vmin=0, vmax=255)
