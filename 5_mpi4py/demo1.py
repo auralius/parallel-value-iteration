@@ -11,9 +11,7 @@ if __name__ == '__main__':
     MAP_FILE = "./maps/map1.jpg"
     MAX_HORIZONS = 2000
     SHOW_INFO = 1
-    STEP_X = 1
-    STEP_Y = 1
-
+    
     cost_mat = get_obstacle_map(MAP_FILE)
 
     # Units are in pixels!
