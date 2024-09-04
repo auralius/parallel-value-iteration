@@ -7,7 +7,7 @@ from path_planner import *
 from path_planner import MPVI
 
 # -----------------------------------------------------------------------------
-MAP_FILE = "./maps/map1.jpg"
+MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
 SHOW_INFO = True
 
@@ -16,11 +16,11 @@ SHOW_INFO = True
 cost_mat = get_obstacle_map(MAP_FILE)
 
 # Units are in pixels!
-src1 = np.array([100, 482], dtype=np.int32)
-src2 = np.array([10, 270], dtype=np.int32)
-src3 = np.array([130, 10], dtype=np.int32)
+src1 = np.array([43, 53], dtype=np.int32)
+src2 = np.array([93, 53], dtype=np.int32)
+src3 = np.array([48, 104], dtype=np.int32)
 
-trgt = np.array([469, 10], dtype=np.int32)
+trgt = np.array([69, 15], dtype=np.int32)
 
 
 q = MPVI(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)

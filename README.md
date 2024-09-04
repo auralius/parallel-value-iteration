@@ -40,16 +40,14 @@ where ``-n 2`` represents the number of CPU cores.
 
 ### Map files
 
-The binary occupacy maps are the JPG files (see `map1.jpg`, `map2.jpg`, and `map3.jpg` as examples).
+The binary occupacy maps are the PNG files located in `maps/` directory.
  
 
-![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map1.png?raw=true)
+![](https://github.com/auralius/binary_terrain_value_iteration/blob/paper/result1.png?raw=true)
 
-![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map2.png?raw=true)
+![](https://github.com/auralius/binary_terrain_value_iteration/blob/paper/result2.png?raw=true)
 
-![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map3.png?raw=true)
-
-![](https://github.com/auralius/binary_terrain_value_iteration/blob/main/result_map4.png?raw=true)
+![](https://github.com/auralius/binary_terrain_value_iteration/blob/paper/result3.png?raw=true)
 
 
 

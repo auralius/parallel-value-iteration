@@ -6,7 +6,7 @@ from helper import *
 from path_planner import *
 
 # -----------------------------------------------------------------------------
-MAP_FILE = "./maps/brick_pattern.png"
+MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
 SHOW_INFO = True
 
@@ -14,21 +14,21 @@ SHOW_INFO = True
 cost_mat = get_obstacle_map(MAP_FILE)
 
 # Units are in pixels!
-src1 = np.array([21, 128], dtype=np.int32)
-src2 = np.array([63, 128], dtype=np.int32)
-src3 = np.array([115, 128], dtype=np.int32)
+src1 = np.array([43, 53], dtype=np.int32)
+src2 = np.array([93, 53], dtype=np.int32)
+src3 = np.array([48, 104], dtype=np.int32)
 
-trgt = np.array([26, 8], dtype=np.int32)
+trgt = np.array([69, 15], dtype=np.int32)
 
 start = time.time()
 descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
 end = time.time()
+
 print("Completion time: ", end - start, " second(s)")
 
 trajs1 = extract_traj(src1, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs2 = extract_traj(src2, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 trajs3 = extract_traj(src3, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
-
 
 fig, ax = plt.subplots()
 ax.imshow(np.transpose(cost_mat), cmap='gray_r', vmin=0, vmax=255)

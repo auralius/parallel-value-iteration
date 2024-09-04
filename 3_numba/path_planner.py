@@ -2,7 +2,7 @@ import numpy as np
 from numba import njit, prange
 
 @njit(parallel=True,fastmath=True)
-def terrain_value_iteration(terrain_mtx, target, steps, max_horizon, append=1):
+def terrain_value_iteration(terrain_mtx, target, max_horizon, append=1):
     terrain_mtx[target[0], target[1]] = 0.0 # set cost at the target to 0
 
     nX = terrain_mtx.shape[0]
@@ -22,7 +22,6 @@ def terrain_value_iteration(terrain_mtx, target, steps, max_horizon, append=1):
     J = np.zeros((nX, nY))
 
     u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32)  
-    u = u * steps
     
     descendentX = np.zeros((nX, nY), dtype=np.int32)
     descendentY = np.zeros((nX, nY), dtype=np.int32)

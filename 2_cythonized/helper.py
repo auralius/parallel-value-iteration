@@ -35,6 +35,6 @@ def extract_traj(src, trgt, descendentX_arr, descendentY_arr, max_horizons):
         if (abs(trajs[k+1, 0]-trgt[0]) + abs(trajs[k+1, 1]-trgt[1])) < 1:
             break
    
-    return trajs[:k]
+    return trajs[:k+2]
 
 # -----------------------------------------------------------------------------

@@ -21,7 +21,7 @@ np.import_array()
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
 
 #------------------------------------------------------------------------------
-def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.ndarray [np.int32_t, ndim=1] target, np.ndarray [np.int32_t, ndim=1] steps, int max_horizon, int append):
+def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.ndarray [np.int32_t, ndim=1] target, int max_horizon, int append):
     terrain_mtx[target[0], target[1]] = 0 # set cost at the target to 0
 
     cdef int nX = terrain_mtx.shape[0]
@@ -47,7 +47,6 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
     cdef np.float32_t *Jprev_ptr = &Jprev[0, 0]
 
     cdef np.ndarray [np.int32_t, ndim=2] u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32)  
-    u = u * steps
     
     cdef np.ndarray [np.int32_t, ndim=2] descendentX = np.zeros((nX, nY), dtype=np.int32)
     cdef np.ndarray [np.int32_t, ndim=2] descendentY = np.zeros((nX, nY), dtype=np.int32)

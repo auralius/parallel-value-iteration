@@ -6,26 +6,24 @@ from helper import *
 from path_planner import *
 
 # -----------------------------------------------------------------------------
-MAP_FILE = "./maps/map4.jpg"
+MAP_FILE = "./maps/maze.png"
 MAX_HORIZONS = 2000
 SHOW_INFO = True
-STEP_X = 1
-STEP_Y = 1
 
 # -----------------------------------------------------------------------------
 cost_mat = get_obstacle_map(MAP_FILE)
 
 # Units are in pixels!
-src = np.array([16, 254], dtype=np.int32)
-trgt = np.array([425, 25], dtype=np.int32)
+src = np.array([8, 126], dtype=np.int32)
+trgt = np.array([125, 61], dtype=np.int32)
 
 start = time.time()
-
-descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
-trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
-
+descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
 end = time.time()
+
 print("Completion time: ", end - start, " second(s)")
+
+trajs = extract_traj(src, trgt, descendantX_arr, descendantY_arr, MAX_HORIZONS)
 
 fig, ax = plt.subplots()
 ax.imshow(np.transpose(cost_mat), cmap='gray_r', vmin=0, vmax=255)

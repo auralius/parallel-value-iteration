@@ -7,32 +7,29 @@ import path_planner
 
 # -----------------------------------------------------------------------------
 
-MAP_FILE = "./maps/map1.jpg"
+MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
 SHOW_INFO = True
-STEP_X = 1
-STEP_Y = 1
-
 
 # -----------------------------------------------------------------------------
 
 cost_mat = get_obstacle_map(MAP_FILE)
 
 # Units are in pixels!
-src1 = np.array([100, 482], dtype=np.int32)
-src2 = np.array([10, 270], dtype=np.int32)
-src3 = np.array([130, 10], dtype=np.int32)
+src1 = np.array([43, 53], dtype=np.int32)
+src2 = np.array([93, 53], dtype=np.int32)
+src3 = np.array([48, 104], dtype=np.int32)
 
-trgt = np.array([469, 10], dtype=np.int32)
+trgt = np.array([69, 15], dtype=np.int32)
 
 start = time.time()
+descendentX_arr, descendentY_arr = path_planner.terrain_value_iteration(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)
+end = time.time()
 
-descendentX_arr, descendentY_arr = path_planner.terrain_value_iteration(cost_mat, trgt, np.array([STEP_X, STEP_Y], dtype=np.int32), MAX_HORIZONS, SHOW_INFO)
 trajs1 = extract_traj(src1, trgt, descendentX_arr, descendentY_arr, MAX_HORIZONS)
 trajs2 = extract_traj(src2, trgt, descendentX_arr, descendentY_arr, MAX_HORIZONS)
 trajs3 = extract_traj(src3, trgt, descendentX_arr, descendentY_arr, MAX_HORIZONS)
 
-end = time.time()
 print("Completion time: ", end - start, " second(s)")
 
 fig, ax = plt.subplots()
