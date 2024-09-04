@@ -2,13 +2,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from helper import *
 from path_planner import *
+
+import sys
+sys.path.insert(1, './utils')
+from helper import *
 
 # -----------------------------------------------------------------------------
 MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
-SHOW_INFO = True
+SHOW_INFO = 1
 
 # -----------------------------------------------------------------------------
 cost_mat = get_obstacle_map(MAP_FILE)

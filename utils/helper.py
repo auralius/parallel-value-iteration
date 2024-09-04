@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 
-def get_obstacle_map(fn):
+def get_obstacle_map(fn, n=1):
     '''
     Create a binary occupancy map by thresholding the colors.
     Apply unit cost for a no-obstacle grid and LARGE for an obstacle grid.
@@ -11,8 +11,15 @@ def get_obstacle_map(fn):
     THRESHOLD = 127
     LARGE = 255
 
-    img = np.asarray(Image.open(fn).convert('L'))
-    height, width = img.shape
+    img = Image.open(fn)
+    width, height = img.size
+
+    if n > 1:
+        width = n * width 
+        height = n * height
+        img = img.resize((width, height))
+
+    img = np.asarray(img.convert('L'))
 
     obstacle_map = np.ones((width, height), dtype=np.int32)
 

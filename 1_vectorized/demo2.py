@@ -2,21 +2,26 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from helper import *
 from path_planner import *
+
+import sys
+sys.path.insert(1, './utils')
+from helper import *
+
 
 # -----------------------------------------------------------------------------
 MAP_FILE = "./maps/maze.png"
 MAX_HORIZONS = 2000
-SHOW_INFO = 1
+SHOW_INFO = 0
+n = 1
 
 # -----------------------------------------------------------------------------
-cost_mat = get_obstacle_map(MAP_FILE)
+cost_mat = get_obstacle_map(MAP_FILE, n=n)
 
 # Units are in pixels!
 # Units are in pixels!
-src = np.array([8, 126], dtype=np.int32)
-trgt = np.array([125, 61], dtype=np.int32)
+src  = n * np.array([8, 126], dtype=np.int32)
+trgt = n * np.array([125, 61], dtype=np.int32)
 
 start = time.time()
 descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)

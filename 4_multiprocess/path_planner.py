@@ -85,7 +85,9 @@ class MPVI:
                 descendentX, descendentY , J  = np.hsplit(results, 3)
 
                 error = np.linalg.norm(J - self._J)
-                print('episode: ', k, ', error: ', error)
+                
+                if self._append == 1:
+                    print('episode: ', k, ', error: ', error)
                 
                 if (past_error - error) < EPSILON:
                     print('Converged!')

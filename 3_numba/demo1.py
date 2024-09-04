@@ -2,24 +2,29 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from helper import *
 from path_planner import *
+
+import sys
+sys.path.insert(1, './utils')
+from helper import *
+
 
 # -----------------------------------------------------------------------------
 MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
-SHOW_INFO = True
+SHOW_INFO = 0
+n = 1
 
 
 # -----------------------------------------------------------------------------
-cost_mat = get_obstacle_map(MAP_FILE)
+cost_mat = get_obstacle_map(MAP_FILE, n=n)
 
 # Units are in pixels!
-src1 = np.array([43, 53], dtype=np.int32)
-src2 = np.array([93, 53], dtype=np.int32)
-src3 = np.array([48, 104], dtype=np.int32)
+src1 = n * np.array([43, 53], dtype=np.int32)
+src2 = n * np.array([93, 53], dtype=np.int32)
+src3 = n * np.array([48, 104], dtype=np.int32)
 
-trgt = np.array([69, 15], dtype=np.int32)
+trgt = n * np.array([69, 15], dtype=np.int32)
 
 start = time.time()
 descendantX_arr, descendantY_arr = terrain_value_iteration(cost_mat, trgt, MAX_HORIZONS, SHOW_INFO)

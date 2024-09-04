@@ -21,7 +21,7 @@ np.import_array()
 @cython.wraparound(False)  # turn off negative index wrapping for entire function
 
 #------------------------------------------------------------------------------
-def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.ndarray [np.int32_t, ndim=1] target, int max_horizon, int append):
+def terrain_value_iteration(np.ndarray [np.int32_t, ndim=2] terrain_mtx, np.ndarray [np.int32_t, ndim=1] target, int max_horizon, int append):
     terrain_mtx[target[0], target[1]] = 0 # set cost at the target to 0
 
     cdef int nX = terrain_mtx.shape[0]
@@ -39,22 +39,22 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
     # Create J matrix
     # row -> x
     # column -> y
-    cdef np.ndarray [np.float32_t, ndim=2] J = np.zeros((nX, nY), dtype=np.float32)
-    cdef np.ndarray [np.float32_t, ndim=2] Jprev = np.zeros((nX, nY), dtype=np.float32)
+    cdef np.ndarray [np.int32_t, ndim=2] J = np.zeros((nX, nY), dtype=np.int32)
+    cdef np.ndarray [np.int32_t, ndim=2] Jprev = np.zeros((nX, nY), dtype=np.int32)
     
     # pointers for memcpy
-    cdef np.float32_t *J_ptr = &J[0, 0]
-    cdef np.float32_t *Jprev_ptr = &Jprev[0, 0]
+    cdef np.int32_t *J_ptr = &J[0, 0]
+    cdef np.int32_t *Jprev_ptr = &Jprev[0, 0]
 
     cdef np.ndarray [np.int32_t, ndim=2] u = np.array([[0,0], [1,0], [0, 1], [-1,0], [0,-1], [-1,-1], [1, 1], [-1,1], [1,-1]], dtype=np.int32)  
     
     cdef np.ndarray [np.int32_t, ndim=2] descendentX = np.zeros((nX, nY), dtype=np.int32)
     cdef np.ndarray [np.int32_t, ndim=2] descendentY = np.zeros((nX, nY), dtype=np.int32)
 
-    cdef double past_error = 1e20
-    cdef double error = 0.0
+    cdef float past_error = 1e20
+    cdef float error = 0.0
 
-    cdef float Jplus1, Jplus1_ 
+    cdef int Jplus1, Jplus1_ 
 
     cdef int xMin, yMin
     cdef int xNext, yNext
@@ -63,7 +63,7 @@ def terrain_value_iteration(np.ndarray [np.float32_t, ndim=2] terrain_mtx, np.nd
 
     print('value iteration is running...')   
 
-    cdef int mem_size = nXY*sizeof(float)
+    cdef int mem_size = nXY*sizeof(int)
 
     for k in range (max_horizon):        
         memcpy(Jprev_ptr, J_ptr, mem_size)        

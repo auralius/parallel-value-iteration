@@ -69,7 +69,9 @@ def terrain_value_iteration(terrain_mtx, target, max_horizon, append=1):
                 descendentY[x, y] = yMin
             
         error = np.linalg.norm(J - Jprev)
-        print('episode: ', k, ', error: ', error)
+
+        if append == 1:
+            print('episode: ', k, ', error: ', error)
         
         if (past_error - error) < EPSILON:
             print('Converged!')

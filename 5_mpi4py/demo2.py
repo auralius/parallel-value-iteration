@@ -2,23 +2,27 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from helper import *
 from path_planner import MPIVI
 from mpi4py import MPI
+
+import sys
+sys.path.insert(1, './utils')
+from helper import *
 
 
 if __name__ == '__main__':
 
     MAP_FILE = "./maps/maze.png"
     MAX_HORIZONS = 2000
-    SHOW_INFO = 1
+    SHOW_INFO = 0
+    n = 1
 
     # -----------------------------------------------------------------------------
-    cost_mat = get_obstacle_map(MAP_FILE)
+    cost_mat = get_obstacle_map(MAP_FILE, n=n)
 
     # Units are in pixels!
-    src = np.array([8, 126], dtype=np.int32)
-    trgt = np.array([125, 61], dtype=np.int32)
+    src  = n * np.array([8, 126], dtype=np.int32)
+    trgt = n * np.array([125, 61], dtype=np.int32)
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()

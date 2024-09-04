@@ -2,24 +2,28 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from helper import *
 from path_planner import MPIVI
 from mpi4py import MPI
+
+import sys
+sys.path.insert(1, './utils')
+from helper import *
 
 
 if __name__ == '__main__':
     MAP_FILE = "./maps/brick_pattern.png"
     MAX_HORIZONS = 2000
-    SHOW_INFO = 1
+    SHOW_INFO = 0
+    n = 1
 
-    cost_mat = get_obstacle_map(MAP_FILE)
+    cost_mat = get_obstacle_map(MAP_FILE, n=n)
 
     # Units are in pixels!
-    src1 = np.array([21, 128], dtype=np.int32)
-    src2 = np.array([63, 128], dtype=np.int32)
-    src3 = np.array([115, 128], dtype=np.int32)
+    src1 = n * np.array([21, 128], dtype=np.int32)
+    src2 = n * np.array([63, 128], dtype=np.int32)
+    src3 = n * np.array([115, 128], dtype=np.int32)
 
-    trgt = np.array([26, 8], dtype=np.int32)
+    trgt = n * np.array([26, 8], dtype=np.int32)
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
