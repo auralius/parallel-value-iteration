@@ -40,7 +40,7 @@ where ``-n 2`` represents the number of CPU cores.
 
 ### Map files
 
-The binary occupacy maps are the PNG files located in `maps/` directory.
+The binary occupacy maps are the PNG files located in `maps/` directory. Maps file are taken from https://imr.ciirc.cvut.cz/planning/maps.xml.
  
 
 ![](https://github.com/auralius/binary_terrain_value_iteration/blob/paper/result1.png?raw=true)
