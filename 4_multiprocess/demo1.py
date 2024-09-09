@@ -13,7 +13,7 @@ from helper import *
 MAP_FILE = "./maps/bugtrap1.png"
 MAX_HORIZONS = 2000
 SHOW_INFO = 0
-n = 1 
+n = 1
 
 
 # -----------------------------------------------------------------------------
