@@ -39,10 +39,35 @@ def print_arrow(u,v):
 def create_map(l, w, n):
     M = np.zeros([l, w], dtype=np.int32)
 
+    # 1. Generate the initial random obstacles
     for k in range(n):
         x = np.random.randint(0, l)
         y = np.random.randint(0, w)
+        # Avoid placing an obstacle exactly on the target (bottom-right)
+        if x == l-1 and y == w-1:
+            continue
         M[x, y] = INF
+
+    # 2. Scan the map and seal diagonal corner-cutting gaps
+    # We stop at l-1 and w-1 so we don't index out of bounds checking neighbors
+    for x in range(l - 1):
+        for y in range(w - 1):
+            
+            # Case 1: Obstacles at top-left and bottom-right
+            if M[x, y] == INF and M[x + 1, y + 1] == INF:
+                # Seal the gap by placing an obstacle in one of the open corners
+                if (x + 1 != l - 1) or (y != w - 1): # Protect target cell
+                    M[x + 1, y] = INF
+                else:
+                    M[x, y + 1] = INF
+
+            # Case 2: Obstacles at bottom-left and top-right
+            if M[x + 1, y] == INF and M[x, y + 1] == INF:
+                # Seal the gap
+                if (x + 1 != l - 1) or (y + 1 != w - 1): # Protect target cell
+                    M[x + 1, y + 1] = INF
+                else:
+                    M[x, y] = INF
 
     return M
 
